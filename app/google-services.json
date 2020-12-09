@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "383506485729",
+    "firebase_url": "https://decode-166dc.firebaseio.com",
+    "project_id": "decode-166dc",
+    "storage_bucket": "decode-166dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:383506485729:android:099cf94bd6da1d39e482a0",
+        "android_client_info": {
+          "package_name": "com.example.simpledecode"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "383506485729-12jrmu0rvt3lnoqlgbcer33ape4fl6m0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmA4Y7CId5jp6RLOwJKIPwjmFwz9aOCBw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "383506485729-12jrmu0rvt3lnoqlgbcer33ape4fl6m0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
