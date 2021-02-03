@@ -157,8 +157,6 @@ public class MainActivity extends AppCompatActivity {
         bit=detectorResult.getBits();
         qrsize = bit.getHeight();
 
-        //int a = detectorResult.getState();
-
         for (int x =0;x < bit.getHeight();x++) {
             for (int y = 0; y < bit.getWidth(); y++) {
                 if (bit.get(y, x) )
