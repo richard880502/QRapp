@@ -15,9 +15,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -53,20 +51,27 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
 
     private Button scan_btn;
+    private Button upload;
     private ImageView img;
     private TextView text;
+    private TextView messaege;
     private EditText username;
     private StorageReference mStorageRef;
+    private Bitmap buffer;
+    private int qrsize;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         scan_btn = (Button)findViewById(R.id.scan_btn);
+        upload = (Button)findViewById(R.id.upload_btn);
         img = (ImageView)findViewById(R.id.imageView);
         username =(EditText)findViewById(R.id.username);
         text =(TextView)findViewById(R.id.data);
+        messaege = (TextView)findViewById(R.id.textView2);
         text.setMovementMethod(ScrollingMovementMethod.getInstance());
+        upload.setOnClickListener(putimage);
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
@@ -78,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view)
             {
                 text.setText("");
+                messaege.setText("");
                 IntentIntegrator integrator = new IntentIntegrator(activity);
                 integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
                 integrator.setPrompt("Scan");
@@ -108,7 +114,8 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 img.setImageBitmap(bitmap);
-                uploadimg(bitmap);
+                buffer = bitmap;
+                messaege.setText("Message: "+result.getContents());
                 Toast.makeText(this,result.getContents(),Toast.LENGTH_SHORT).show();
             }
         }
@@ -148,22 +155,34 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         bit=detectorResult.getBits();
-        int a = detectorResult.getState();
+        qrsize = bit.getHeight();
 
-        text.append("brother: "+Integer.toString(a)+"\n\n");
+        //int a = detectorResult.getState();
+
         for (int x =0;x < bit.getHeight();x++) {
             for (int y = 0; y < bit.getWidth(); y++) {
-                if (bit.get(y, x))
-                    text.append("1");
-                else
+                if (bit.get(y, x) )
                     text.append("0");
+                else
+                    text.append("1");
             }
-            //text.append("\n");
+            text.append("\n");
         }
-        //text.append("end line");
-        //System.out.println(text.getText());
+    }
+
+
+    private View.OnClickListener putimage = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            uploadimg(buffer);
+            uploaddata();
+        }
+    };
+
+    public void uploaddata(){
         String filename = username.getText().toString();
         String fileContents = text.getText().toString();
+        fileContents = fileContents.replaceAll("\r|\n", "");
 
         Calendar mCal = Calendar.getInstance();
         CharSequence s = DateFormat.format("yyyy-MM-dd kk:mm:ss", mCal.getTime());
@@ -171,11 +190,12 @@ public class MainActivity extends AppCompatActivity {
         DatabaseReference rootname = database.getReference(filename);
         DatabaseReference myRef = database.getReference(filename+"/decode");
         DatabaseReference day = database.getReference(filename+"/date");
+        DatabaseReference size = database.getReference(filename+"/size");
         //rootname.child("decode").setValue(fileContents);
         //rootname.child("date").setValue(s.toString());
+        size.setValue(qrsize);
         day.setValue(s.toString());
         myRef.setValue(fileContents);
-
     }
 
     public void uploadimg(Bitmap bitmap){
@@ -194,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get a URL to the uploaded content
                        // Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        Toast.makeText(getApplicationContext(), "upload success", Toast.LENGTH_SHORT).show();
                     }
                 });
                 /*.addOnFailureListener(new OnFailureListener() {
